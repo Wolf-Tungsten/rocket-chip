@@ -42,7 +42,7 @@ bootrom: $(BOOTROM_IMG)
 
 SCALA_FILE = $(shell find ./src/main/scala -name '*.scala')
 
-$(TOP_V): $(SCALA_FILE) $(BOOTROM_IMG)
+$(TOP_V) $(TOP_FIR): $(SCALA_FILE) $(BOOTROM_IMG)
 	mill -i rocketchip.runMain $(FUZZ_TOP) $(CHISEL_ARGS)
 ifeq ($(CHISEL_TARGET),systemverilog)
 	@cp src/main/resources/vsrc/EICG_wrapper.v $(RTL_DIR)
@@ -55,8 +55,18 @@ endif
 
 sim-verilog: $(TOP_V)
 
-emu: sim-verilog
-	@$(MAKE) -C difftest emu WITH_CHISELDB=0 WITH_CONSTANTIN=0
+ifeq ($(GSIM),1)
+sim-verilog: $(TOP_FIR)
+endif
+
+.PHONY: emu gsim-emu
+emu:
+	@$(MAKE) GSIM=0 sim-verilog
+	@$(MAKE) -C difftest emu WITH_CHISELDB=0 WITH_CONSTANTIN=0 GSIM=0
+
+gsim-emu:
+	@$(MAKE) GSIM=1 sim-verilog
+	@$(MAKE) -C difftest emu WITH_CHISELDB=0 WITH_CONSTANTIN=0 GSIM=1
 
 simv: sim-verilog
 	@$(MAKE) -C difftest simv WITH_CHISELDB=0 WITH_CONSTANTIN=0
