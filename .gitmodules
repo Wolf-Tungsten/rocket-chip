@@ -6,7 +6,7 @@
 	url = https://github.com/chipsalliance/cde.git
 [submodule "difftest"]
 	path = difftest
-	url = https://github.com/OpenXiangShan/difftest.git
+	url = git@github.com:Wolf-Tungsten/difftest.git
 [submodule "dependencies/chisel"]
 	path = dependencies/chisel
 	url = https://github.com/chipsalliance/chisel.git
